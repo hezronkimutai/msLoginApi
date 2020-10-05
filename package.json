@@ -1,0 +1,62 @@
+{
+  "name": "express-authorshaven",
+  "version": "1.0.0",
+  "description": "A Social platform for the creative at heart",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm build && node /app/build/index.js",
+    "build": "babel -d build/ src",
+    "eslint": "eslint --ignore-path .gitignore .",
+    "db-seed": "NODE_ENV=testing npx sequelize-cli db:seed:undo:all && NODE_ENV=testing sequelize db:seed:all",
+    "db-seed-dev": "npx sequelize-cli db:seed:undo:all && sequelize db:seed:all",
+    "test": "NODE_ENV=testing npm run dropTables && NODE_ENV=testing npm run db-migrate && NODE_ENV=testing npm run db-seed && NODE_ENV=testing nyc --reporter=text --reporter=html --require @babel/polyfill --require @babel/register mocha ./src/tests/*  --timeout 200000 --exit",
+    "db-migrate": "sequelize db:migrate",
+    "dropTables": "sequelize db:migrate:undo:all",
+    "dev": "nodemon --exec babel-node ./src/index.js",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
+  },
+  "author": "Andela Simulations Programme",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/polyfill": "^7.7.0",
+    "@hapi/joi": "^16.1.7",
+    "babel-eslint": "^10.0.3",
+    "bcrypt": "^3.0.7",
+    "body-parser": "^1.18.3",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "cors": "^2.8.5",
+    "dotenv": "^6.0.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mocha": "^6.2.2",
+    "pg": "^7.12.1",
+    "pg-hstore": "^2.3.3",
+    "pg-native": "^3.0.0",
+    "sequelize": "^5.21.2",
+    "sequelize-cli": "^5.5.1",
+    "swagger-jsdoc": "^3.4.0",
+    "swagger-ui-express": "^4.1.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.7.0",
+    "@babel/core": "^7.7.2",
+    "@babel/node": "^7.7.0",
+    "@babel/plugin-transform-runtime": "^7.6.2",
+    "@babel/preset-env": "^7.7.1",
+    "@babel/register": "^7.7.0",
+    "@babel/runtime": "^7.7.2",
+    "babel-loader": "^8.0.6",
+    "coveralls": "^3.0.7",
+    "eslint": "^6.6.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2",
+    "nodemon": "^1.19.4",
+    "nyc": "^14.1.1"
+  },
+  "nyc": {
+    "exclude": [
+      "**/**/**/swaggerOptions.js"
+    ]
+  }
+}
