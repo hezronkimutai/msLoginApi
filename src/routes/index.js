@@ -5,7 +5,7 @@ import swaggerOption from "../utils/swaggerOptions";
 import authRoute from "./api/authRoute";
 
 const router = Router();
-router.use("/api", authRoute);
+router.use("/api/auth", authRoute);
 const specs = swaggerJsdoc(swaggerOption);
 
 router.use("/api-docs", swaggerUi.serve);
