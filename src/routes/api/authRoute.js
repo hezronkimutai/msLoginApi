@@ -33,16 +33,14 @@ authRouter.post("/auth", async (req, res, next) => {
         await readFbData("users", async (users) => {
           token = await genToken({ email: decoded.preferred_username });
           Object.keys(users).map(async (key) => {
-            if (users[key].preferred_username === decoded.preferred_username) {
-              msUserInDb = true;
-            }
+            if (users[key].preferred_username === decoded.preferred_username) msUserInDb = true;
           });
+          if (!msUserInDb) writeFbData("users", decoded);
           responseObject.message = "login successfully";
           responseObject.status = 200;
           responseObject.token = token;
           responseHandler(responseObject);
         });
-        if (!msUserInDb) writeFbData("users", decoded);
       }));
   } catch (error) {
     res.status(400).send(error);
