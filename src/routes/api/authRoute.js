@@ -13,7 +13,7 @@ authRouter.post("/signup", signupController);
  * /auth/signin:
  *    post:
  *      summary: User login
- *      tags: [Users]
+ *      tags: [Signin]
  *      requestBody:
  *        required: true
  *        content:
@@ -32,6 +32,8 @@ authRouter.post("/signup", signupController);
  *     Signin:
  *       type: "object"
  *       properties:
+ *         type:
+ *           type: string
  *         email:
  *           type: string
  *         password:
@@ -47,14 +49,14 @@ authRouter.post("/signup", signupController);
  *
  * /auth/signup:
  *    post:
- *      summary: User login
- *      tags: [Users]
+ *      summary: User Signup
+ *      tags: [Signup]
  *      requestBody:
  *        required: true
  *        content:
  *          application/json:
  *            schema:
- *              $ref: '#/components/schemas/Signin'
+ *              $ref: '#/components/schemas/Signup'
  *      responses:
  *        "200":
  *          description: 'A user schema'
@@ -64,9 +66,11 @@ authRouter.post("/signup", signupController);
  *          description: 'Server Error'
  * components:
  *   schemas:
- *     Signin:
+ *     Signup:
  *       type: "object"
  *       properties:
+ *         name:
+ *           type: string
  *         email:
  *           type: string
  *         password:
