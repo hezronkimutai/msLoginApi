@@ -1,16 +1,15 @@
 import jwt from "jsonwebtoken";
 import { writeFbData, readFbData } from "../utils/fb";
-
+import { responseHandler } from "../utils";
 const { pubKey, secretKey } = process.env;
 const publicKey = `-----BEGIN CERTIFICATE-----\n${pubKey}\n-----END CERTIFICATE-----`;
 let responseObject = {};
 const genToken = async (data) => await jwt.sign(data, secretKey);
-const responseHandler = (resObj, res) => res.status(resObj.status || 204).send(resObj);
+// const responseHandler = (resObj, res) => res.status(resObj.status || 204).send(resObj);
 const signInController = async (req, res, next) => {
   let msUserInDb, token;
 
   const { type, email, password } = req.body;
-  const idToken = req.headers.authorization;
   const sendLoginResponse = (message, status, tkn) => {
     responseObject.message = message || "login successfully";
     responseObject.status = status || 200;
@@ -27,17 +26,17 @@ const signInController = async (req, res, next) => {
       }));
 
     type === "microsoft" &&
-      (await jwt.verify(idToken, publicKey, { algorithms: ["RS256"] }, async (err, decoded) => {
-        await readFbData("users", async (users) => {
-          token = await genToken({ email: decoded.preferred_username, type });
-          Object.keys(users).map(async (key) => {
-            if (users[key].email === decoded.preferred_username) msUserInDb = true;
-          });
-          if (!msUserInDb) {
-            writeFbData("users", { email: decoded.preferred_username, password: "microsoft", name: decoded.name });
-          }
-          sendLoginResponse();
+      (await readFbData("users", async (users) => {
+        console.log("###############################");
+        const decoded = req.msUser;
+        token = await genToken({ email: decoded.preferred_username, type });
+        Object.keys(users).map(async (key) => {
+          if (users[key].email === decoded.preferred_username) msUserInDb = true;
         });
+        if (!msUserInDb) {
+          writeFbData("users", { email: decoded.preferred_username, password: "microsoft", name: decoded.name });
+        }
+        sendLoginResponse();
       }));
   } catch (error) {
     res.status(400).send(error);
@@ -45,16 +44,9 @@ const signInController = async (req, res, next) => {
 };
 
 export const signupController = async (req, res, next) => {
-  let userInDb, token;
+  let token;
   const { name, email, password } = req.body;
-  await readFbData("users", async (users) => {
-    Object.keys(users).map(async (key) => {
-      if (users[key].email === email) userInDb = true;
-    });
-    if (!userInDb) {
-      writeFbData("users", { name, email, password });
-    }
-  });
+  writeFbData("users", { name, email, password });
   token = await genToken({ email, type: "local" });
   responseObject.message = "Signup successful";
   responseObject.status = 200;

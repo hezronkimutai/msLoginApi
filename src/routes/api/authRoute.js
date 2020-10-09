@@ -1,11 +1,12 @@
 import { signInController, signupController } from "../../controllers/auth";
+import { checkConflict, verifyMsToken } from "../../middlewares";
 import express from "express";
 
 const authRouter = express.Router();
 export default authRouter;
 
-authRouter.post("/signin", signInController);
-authRouter.post("/signup", signupController);
+authRouter.post("/signin", verifyMsToken, signInController);
+authRouter.post("/signup", checkConflict, signupController);
 
 /**
  * @swagger
