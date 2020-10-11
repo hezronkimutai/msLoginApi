@@ -27,7 +27,6 @@ const signInController = async (req, res, next) => {
 
     type === "microsoft" &&
       (await readFbData("users", async (users) => {
-        console.log("###############################");
         const decoded = req.msUser;
         token = await genToken({ email: decoded.preferred_username, type });
         Object.keys(users).map(async (key) => {
