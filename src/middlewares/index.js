@@ -18,6 +18,7 @@ const checkConflict = async (req, res, next) => {
 const verifyMsToken = async (req, res, next) => {
   const idToken = req.headers.authorization;
   const { type } = req.body;
+
   type === "microsoft" &&
     readPublicKey(async (dta) => {
       await jwt.verify(idToken, genPublic(dta), { algorithms: ["RS256"] }, async (err, decoded) => {
