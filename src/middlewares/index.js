@@ -20,7 +20,7 @@ const checkConflict = async (req, res, next) => {
   });
 };
 const readPublicKey = (cb) => {
-  fs.readFile("pubKey.log", "utf8", function (err, data) {
+  fs.readFile("logs/pubKey.log", "utf8", function (err, data) {
     if (err) {
       console.log(err);
       cb(false);
@@ -32,7 +32,7 @@ const newPublicKey = async () => {
   try {
     const rs = await axios(pubKeyUrl);
     const pbKey = rs.data["keys"][0]["x5c"];
-    fs.writeFile("pubKey.log", pbKey[0], function (err) {
+    fs.writeFile("logs/pubKey.log", pbKey[0], function (err) {
       if (err) console.log(err);
       console.log("Pubkey stored in log file");
     });
