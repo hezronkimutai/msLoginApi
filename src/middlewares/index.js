@@ -15,28 +15,46 @@ const checkConflict = async (req, res, next) => {
   });
 };
 
+const vrfyTkn = async (idTkn, pbKey) => {
+  try {
+    return await jwt.verify(idTkn, genPublic(pbKey), { algorithms: ["RS256"] });
+  } catch (error) {
+    return false;
+  }
+};
+
+const nextMiddleware = (req, next, decoded) => {
+  req.msUser = decoded;
+  return next();
+};
+
 const verifyMsToken = async (req, res, next) => {
   const idToken = req.headers.authorization;
   const { type } = req.body;
-
+  const vError = async () => {
+    const tkn = await newPublicKey();
+    const decoded = await vrfyTkn(idToken, tkn);
+    if (decoded) {
+      return nextMiddleware(req, next, decoded);
+    }
+    if (!decoded) {
+      return responseHandler({ status: 400, message: "Invalid token" }, res);
+    }
+  };
   type === "microsoft" &&
     readPublicKey(async (dta) => {
-      await jwt.verify(idToken, genPublic(dta), { algorithms: ["RS256"] }, async (err, decoded) => {
-        if (err) {
-          console.log(err);
-          const tkn = await newPublicKey();
-          return await jwt.verify(idToken, genPublic(tkn), { algorithms: ["RS256"] }, async (err, decoded) => {
-            if (err) {
-              console.log(err);
-              return responseHandler({ status: 400, message: "Invalid token" }, res);
-            }
-            req.msUser = decoded;
-            return next();
-          });
+      if (!dta) {
+        return await vError();
+      }
+      if (dta) {
+        const decoded = await vrfyTkn(idToken, dta);
+        if (decoded) {
+          return nextMiddleware(req, next, decoded);
         }
-        req.msUser = decoded;
-        return next();
-      });
+        if (!decoded) {
+          return await vError();
+        }
+      }
     });
   type === "local" && next();
 };
