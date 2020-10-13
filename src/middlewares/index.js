@@ -1,5 +1,5 @@
 import { readFbData } from "../utils/fb";
-import { responseHandler, readPublicKey, newPublicKey, genPublic } from "../utils";
+import { responseHandler, log, readPublicKey, newPublicKey, genPublic } from "../utils";
 import jwt from "jsonwebtoken";
 
 const checkConflict = async (req, res, next) => {
@@ -28,36 +28,45 @@ const nextMiddleware = (req, next, decoded) => {
   return next();
 };
 
-const verifyMsToken = async (req, res, next) => {
+const handleMicrosoftSignin = async (req, res, next) => {
   const idToken = req.headers.authorization;
-  const { type } = req.body;
+  let decoded;
+  log("info", "Verify id token");
 
-  const handleMicrosoft = async () => {
-    const decoded = await vrfyTkn(idToken, req.publicKey);
-    if (decoded) {
-      return nextMiddleware(req, next, decoded);
-    }
-    if (!decoded) {
-      const tkn = await newPublicKey();
-      const decoded = await vrfyTkn(idToken, tkn);
-      if (decoded) {
-        return nextMiddleware(req, next, decoded);
-      }
-      if (!decoded) {
-        return responseHandler({ status: 400, message: "Invalid token" }, res);
-      }
-    }
-  };
-  type === "microsoft" && handleMicrosoft();
+  decoded = await vrfyTkn(idToken, req.publicKey);
+  if (decoded) {
+    log("info", "DECODED, call next");
+    return nextMiddleware(req, next, decoded);
+  }
+  log("info", "NOT DECODED: decode again with new public key fetched from MS");
+
+  decoded = await vrfyTkn(idToken, await newPublicKey());
+  if (decoded) {
+    log("info", "DECODED, call next");
+
+    return nextMiddleware(req, next, decoded);
+  }
+  log("info", "NOT DECODED: return 401 invalid token");
+
+  return responseHandler({ status: 401, message: "UNAUTHORIZED: Invalid token" }, res);
+};
+const verifyMsToken = async (req, res, next) => {
+  const { type } = req.body;
+  type === "microsoft" && handleMicrosoftSignin(req, res, next);
   type === "local" && next();
 };
 const checkPublicKeyExistance = (req, res, next) => {
+  log("info", "Read public key from log file");
+
   readPublicKey(async (pubKey) => {
     if (!pubKey) {
+      log("info", "LOG FILE DON'T EXIST");
+      log("info", "public key is fetched and stored in cache(log file)");
       const publicKey = await newPublicKey();
       req.publicKey = publicKey;
       return next();
     }
+    log("info", "LOG FILE EXIST");
     req.publicKey = pubKey;
     return next();
   });

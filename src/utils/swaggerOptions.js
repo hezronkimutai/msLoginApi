@@ -41,6 +41,6 @@ const options = {
       },
     ],
   },
-  apis: [path.resolve(__dirname, "../routes/api/authRoute.js")],
+  apis: [path.resolve(__dirname, "../routes/swaggerDocs/index.js")],
 };
 export default options;

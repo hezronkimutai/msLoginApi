@@ -1,11 +1,9 @@
 import jwt from "jsonwebtoken";
 import { writeFbData, readFbData } from "../utils/fb";
 import { responseHandler } from "../utils";
-const { pubKey, secretKey } = process.env;
-const publicKey = `-----BEGIN CERTIFICATE-----\n${pubKey}\n-----END CERTIFICATE-----`;
+const { secretKey } = process.env;
 let responseObject = {};
 const genToken = async (data) => await jwt.sign(data, secretKey);
-// const responseHandler = (resObj, res) => res.status(resObj.status || 204).send(resObj);
 const signInController = async (req, res, next) => {
   let msUserInDb, token;
 
