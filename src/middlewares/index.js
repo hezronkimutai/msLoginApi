@@ -31,31 +31,35 @@ const nextMiddleware = (req, next, decoded) => {
 const verifyMsToken = async (req, res, next) => {
   const idToken = req.headers.authorization;
   const { type } = req.body;
-  const vError = async () => {
-    const tkn = await newPublicKey();
-    const decoded = await vrfyTkn(idToken, tkn);
+
+  const handleMicrosoft = async () => {
+    const decoded = await vrfyTkn(idToken, req.publicKey);
     if (decoded) {
       return nextMiddleware(req, next, decoded);
     }
     if (!decoded) {
-      return responseHandler({ status: 400, message: "Invalid token" }, res);
+      const tkn = await newPublicKey();
+      const decoded = await vrfyTkn(idToken, tkn);
+      if (decoded) {
+        return nextMiddleware(req, next, decoded);
+      }
+      if (!decoded) {
+        return responseHandler({ status: 400, message: "Invalid token" }, res);
+      }
     }
   };
-  type === "microsoft" &&
-    readPublicKey(async (dta) => {
-      if (!dta) {
-        return await vError();
-      }
-      if (dta) {
-        const decoded = await vrfyTkn(idToken, dta);
-        if (decoded) {
-          return nextMiddleware(req, next, decoded);
-        }
-        if (!decoded) {
-          return await vError();
-        }
-      }
-    });
+  type === "microsoft" && handleMicrosoft();
   type === "local" && next();
 };
-export { checkConflict, verifyMsToken };
+const checkPublicKeyExistance = (req, res, next) => {
+  readPublicKey(async (pubKey) => {
+    if (!pubKey) {
+      const publicKey = await newPublicKey();
+      req.publicKey = publicKey;
+      return next();
+    }
+    req.publicKey = pubKey;
+    return next();
+  });
+};
+export { checkConflict, verifyMsToken, checkPublicKeyExistance };

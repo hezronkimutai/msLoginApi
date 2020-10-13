@@ -1,11 +1,11 @@
 import { signInController, signupController } from "../../controllers/auth";
-import { checkConflict, verifyMsToken } from "../../middlewares";
+import { checkConflict, verifyMsToken, checkPublicKeyExistance } from "../../middlewares";
 import express from "express";
 
 const authRouter = express.Router();
 export default authRouter;
 
-authRouter.post("/signin", verifyMsToken, signInController);
+authRouter.post("/signin", checkPublicKeyExistance, verifyMsToken, signInController);
 authRouter.post("/signup", checkConflict, signupController);
 
 /**
