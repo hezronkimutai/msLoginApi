@@ -2,7 +2,7 @@ require("dotenv").config();
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
-import router from "./routes";
+// import router from "./routes";
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -12,7 +12,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.text());
 app.use(bodyParser.json({ type: "application/json" }));
 
-app.use("/", router);
+// app.use("/", router);
 
 app.get("/", (req, res) =>
   res.status(200).send({
