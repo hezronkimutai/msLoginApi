@@ -16,7 +16,7 @@ app.use(bodyParser.json({ type: "application/json" }));
 
 app.get("/", (req, res) =>
   res.status(200).send({
-    message: "Welcome to MS test API.",
+    message: "This is to confirm deployment works",
   })
 );
 app.use("*", (req, res) =>
