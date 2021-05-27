@@ -16,7 +16,7 @@ app.use(bodyParser.json({ type: "application/json" }));
 
 app.get("/", (req, res) =>
   res.status(200).send({
-    message: "This is to confirm deployment works",
+    message: "This is to confirm deployment works 2nd time",
   })
 );
 app.use("*", (req, res) =>
