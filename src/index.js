@@ -16,7 +16,7 @@ app.use(bodyParser.json({ type: "application/json" }));
 
 app.get("/", (req, res) =>
   res.status(200).send({
-    message: "Github webhook trigger confirmation",
+    message: "First test",
   })
 );
 app.use("*", (req, res) =>
