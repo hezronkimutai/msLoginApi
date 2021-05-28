@@ -16,7 +16,7 @@ app.use(bodyParser.json({ type: "application/json" }));
 
 app.get("/", (req, res) =>
   res.status(200).send({
-    message: "does pipeline work?",
+    message: "This confirms that the pipeline works",
   })
 );
 app.use("*", (req, res) =>
